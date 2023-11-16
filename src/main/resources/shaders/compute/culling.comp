@@ -1,0 +1,115 @@
+#version 450 core
+
+struct DrawCommand {
+    uint count;
+    uint instanceCount;
+    uint firstIndex;
+    uint baseVertex;
+    uint baseInstance;
+};
+
+struct BoundingSphere {
+    float centerX;
+    float centerY;
+    float centerZ;
+    float radius;
+};
+
+@include "structs/transform.glsl"
+
+
+layout(local_size_x = 128) in;
+
+
+layout(std430, binding = 0) readonly buffer MeshCommandBuffer {
+    DrawCommand[] u_MeshCommands;
+};
+
+layout(std430, binding = 1) writeonly buffer CommandBuffer {
+    DrawCommand[] u_InstanceCommands;
+};
+
+layout(std430, binding = 2) readonly buffer BoundingSpheres {
+    BoundingSphere u_BoundingSpheres[];
+};
+
+layout(std430, binding = 3) readonly buffer Transforms {
+    Transform u_Transforms[];
+};
+
+layout(std430, binding = 4) readonly buffer MeshIndices {
+    int u_MeshIndices[];
+};
+
+layout(std140, binding = 5) uniform Frustum {
+    mat4 projectionViewMatrix;
+    vec4 planes[6];
+} u_Frustum;
+
+layout(binding = 6) uniform atomic_uint u_DrawCount;
+
+uniform bool u_AlwaysPass;
+
+
+bool testSphere(vec3 center, float radius) {
+
+    for(int i = 0;i < 6;i++) {
+
+        vec4 plane = u_Frustum.planes[i];
+
+        if (plane.x * center.x + plane.y * center.y + plane.z * center.z + plane.w <= -radius) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+float getScale(mat4 m) {
+
+    vec3 scale;
+
+    scale.x = sqrt(m[0][0] * m[0][0] + m[0][1] * m[0][1] + m[0][2] * m[0][2]);
+    scale.y = sqrt(m[1][0] * m[1][0] + m[1][1] * m[1][1] + m[1][2] * m[1][2]);
+    scale.z = sqrt(m[2][0] * m[2][0] + m[2][1] * m[2][1] + m[2][2] * m[2][2]);
+
+    return max(scale.x, max(scale.y, scale.z));
+}
+
+bool isVisible(mat4 modelMatrix, BoundingSphere boundingSphere) {
+
+    vec4 sphereCenter = vec4(boundingSphere.centerX, boundingSphere.centerY, boundingSphere.centerZ, 1.0);
+
+    sphereCenter = modelMatrix * sphereCenter;
+
+    float radius = boundingSphere.radius * getScale(modelMatrix);
+
+    // debug[gl_GlobalInvocationID.x] = vec4(gl_GlobalInvocationID.xyz, 0);
+
+    // This does not work. I don't know if it has to do with the bounding sphere, or with the frustum calculation
+    return testSphere(sphereCenter.xyz, radius);
+}
+
+void main() {
+
+    const uint index = gl_GlobalInvocationID.x;
+
+    const int meshIndex = u_MeshIndices[index];
+
+    const Transform transform = u_Transforms[index];
+
+    DrawCommand meshCommand = u_MeshCommands[meshIndex];
+
+    DrawCommand command = meshCommand;
+
+    command.baseInstance = index;
+
+    if(u_AlwaysPass || isVisible(transform.modelMatrix, u_BoundingSpheres[meshIndex])) {
+        command.instanceCount = 1;
+        atomicCounterIncrement(u_DrawCount);
+    } else {
+        command.instanceCount = 0;
+    }
+
+    u_InstanceCommands[index] = command;
+}
