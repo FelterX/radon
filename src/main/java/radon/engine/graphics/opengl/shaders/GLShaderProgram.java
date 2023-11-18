@@ -181,6 +181,14 @@ public final class GLShaderProgram extends GLObject {
         uniformInt(name, value ? 1 : 0);
     }
 
+    public void uniformArrayInt(String name, int[] value) {
+        uniformArrayInt(uniformLocation(name), value);
+    }
+
+    public void uniformArrayInt(int location, int[] value) {
+        glUniform1iv(location, value);
+    }
+
     public void unbindTextures() {
 
         if (boundTextures.isEmpty()) {

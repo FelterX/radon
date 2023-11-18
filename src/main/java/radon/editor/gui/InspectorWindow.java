@@ -112,7 +112,8 @@ public class InspectorWindow extends EditorWindow {
 
     private void renderComponent(Component comp, int id) {
 
-        comp.enable(EditorGUI.checkbox("##enable", comp.enabled()));
+        comp.enable(EditorGUI.checkbox("##active", comp.enabled()));
+
         ImGui.sameLine();
         GLTexture2D icon = icons.getOrDefault(comp.getClass(), defaultIcon);
         ImGui.image(icon.handle(), 20, 20);
@@ -138,8 +139,9 @@ public class InspectorWindow extends EditorWindow {
 
                     boolean variableUpdated = false;
                     boolean isPrivate = Modifier.isPrivate(field.getModifiers());
+                    boolean isProtected = Modifier.isProtected(field.getModifiers());
                     boolean isStatic = Modifier.isStatic(field.getModifiers());
-                    if (isPrivate || isStatic || field.getModifiers() == 0) {
+                    if (isPrivate || isProtected || isStatic || field.getModifiers() == 0) {
                         continue;
                     }
 

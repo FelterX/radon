@@ -3,6 +3,11 @@ package radon.editor.core;
 import radon.editor.gui.*;
 import radon.engine.core.Radon;
 import radon.engine.core.RadonApplication;
+import radon.engine.core.RadonFiles;
+import radon.engine.graphics.GraphicsFactory;
+import radon.engine.graphics.opengl.textures.GLTexture2D;
+import radon.engine.graphics.textures.Texture;
+import radon.engine.images.PixelFormat;
 import radon.engine.logging.Log;
 import radon.engine.materials.MaterialFactory;
 import radon.engine.materials.PhongMaterial;
@@ -12,7 +17,10 @@ import radon.engine.scenes.Entity;
 import radon.engine.scenes.Scene;
 import radon.engine.scenes.components.math.Transform;
 import radon.engine.scenes.components.meshes.StaticMeshInstance;
+import radon.engine.scenes.components.sprites.SpriteInstance;
+import radon.engine.sprites.Sprite;
 import radon.engine.util.Color;
+import radon.engine.util.geometry.Rect;
 import radon.project.GameType;
 import radon.project.Project;
 import radon.project.serialization.Serializer;
@@ -51,12 +59,12 @@ public class RadonEditor extends RadonApplication {
 
         if (projectPath != null) {
             File file = new File(projectPath);
-            if(file.exists()){
+            if (file.exists()) {
                 project = Serializer.deserialize(projectPath);
             }
         }
 
-        if(project == null){
+        if (project == null) {
             project = new Project("UnnamedRadonProject", null, Radon.RADON_VERSION, GameType.THREE_DIMENSION);
         }
     }
@@ -96,7 +104,6 @@ public class RadonEditor extends RadonApplication {
 
         // root.get(Transform.class).addChild(map.get(Transform.class));
         map.get(Transform.class).addChild(floor.get(Transform.class));
-
     }
 
     @Override

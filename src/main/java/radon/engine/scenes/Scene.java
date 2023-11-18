@@ -12,8 +12,11 @@ import radon.engine.scenes.components.math.TransformManager;
 import radon.engine.scenes.components.meshes.MeshInstance;
 import radon.engine.scenes.components.meshes.MeshInstanceManager;
 import radon.engine.scenes.components.meshes.SceneMeshInfo;
+import radon.engine.scenes.components.sprites.SpriteInstance;
+import radon.engine.scenes.components.sprites.SpriteInstanceManager;
 import radon.engine.scenes.environment.SceneEnhancedWater;
 import radon.engine.scenes.environment.SceneEnvironment;
+import radon.engine.sprites.SceneSpriteInfo;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -47,6 +50,7 @@ public final class Scene {
     private final BehaviourManager behaviours;
     private final MeshInstanceManager meshes;
     private final AudioPlayerManager audio;
+    private final SpriteInstanceManager sprites;
 
     private final Map<Class<? extends Component>, ComponentManager<?>> componentManagers;
     // ===
@@ -81,6 +85,7 @@ public final class Scene {
         behaviours = newInstance(BehaviourManager.class, this);
         meshes = newInstance(MeshInstanceManager.class, this);
         audio = newInstance(AudioPlayerManager.class, this);
+        sprites = newInstance(SpriteInstanceManager.class, this);
 
         componentManagers = createComponentManagersMap();
         // ===
@@ -104,6 +109,9 @@ public final class Scene {
 
     public SceneMeshInfo meshInfo() {
         return meshes;
+    }
+    public SceneSpriteInfo spriteInfo() {
+        return sprites;
     }
 
     public SceneRenderInfo renderInfo() {
@@ -337,6 +345,7 @@ public final class Scene {
         components.put(Transform.class, transforms);
         components.put(MeshInstance.class, meshes);
         components.put(AudioPlayer.class, audio);
+        components.put(SpriteInstance.class, sprites);
 
         return components;
     }
