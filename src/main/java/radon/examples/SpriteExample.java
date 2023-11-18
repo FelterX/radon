@@ -8,19 +8,23 @@ import radon.engine.graphics.GraphicsFactory;
 import radon.engine.graphics.opengl.textures.GLTexture2D;
 import radon.engine.graphics.textures.Texture;
 import radon.engine.images.PixelFormat;
+import radon.engine.input.Input;
+import radon.engine.input.Key;
 import radon.engine.scenes.Camera;
 import radon.engine.scenes.Entity;
 import radon.engine.scenes.Scene;
 import radon.engine.scenes.SceneManager;
+import radon.engine.scenes.components.behaviours.Behaviour;
 import radon.engine.scenes.components.math.Transform;
 import radon.engine.scenes.components.sprites.SpriteInstance;
 import radon.engine.sprites.Sprite;
 import radon.engine.util.geometry.Rect;
 
+import static radon.engine.core.Time.*;
+
 public class SpriteExample extends RadonApplication {
 
     public static void main(String[] args) {
-        RadonConfiguration.VSYNC.set(false);
         Radon.launch(new SpriteExample());
     }
 
@@ -38,14 +42,12 @@ public class SpriteExample extends RadonApplication {
         Sprite sprite0 = new Sprite(texture, new Rect(0, 16, 0, 16));
         Sprite sprite1 = new Sprite(texture, new Rect(16, 32, 0, 16));
 
-        float scale = 1 / 24f;
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                Entity e = scene.newEntity("Sprite" + i + "_" + j);
-                e.add(SpriteInstance.class).sprite(sprite0, 0);
-                e.get(Transform.class).position(i * scale, j * scale, 0);
-                e.get(Transform.class).scale(scale);
-            }
-        }
+
+        Entity e = scene.newEntity();
+        e.add(SpriteInstance.class).sprite(sprite0);
+        e.get(Transform.class).position(0,0, 0);
+        e.get(Transform.class).scale(0.2f);
+        e.add(SpriteBehaviour.class);
+
     }
 }

@@ -132,6 +132,9 @@ public final class Scene {
     }
 
     void update() {
+        transforms.update();
+        sprites.update();
+
         behaviours.update();
     }
 
@@ -157,7 +160,6 @@ public final class Scene {
             }
         }
 
-        transforms.update();
         environment.update();
 
         renderSystem.prepare(this);

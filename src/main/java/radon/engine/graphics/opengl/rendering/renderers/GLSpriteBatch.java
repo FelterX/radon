@@ -159,7 +159,7 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
             SpriteInstance instance = sprites[i];
             Transform transform = (Transform) instance.get(Transform.class);
             Sprite sprite = instance.sprite();
-            if (transform.modified()) {
+            if (instance.modified() || transform.modified()) {
                 if (!hasTexture(sprite.texture())) {
                     this.renderer.remove(instance);
                     this.renderer.add(instance);

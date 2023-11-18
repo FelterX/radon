@@ -12,6 +12,8 @@ public class SpriteInstance extends Component {
     protected Sprite sprite;
     protected int layerOrder;
 
+    private boolean modified;
+
     protected SpriteInstance() {
 
     }
@@ -23,20 +25,20 @@ public class SpriteInstance extends Component {
         layerOrder = 0;
     }
 
+    protected void update() {
+        modified = false;
+    }
 
     @Override
     protected void onEnable() {
-
     }
 
     @Override
     protected void onDisable() {
-
     }
 
     @Override
     protected void onDestroy() {
-
     }
 
     @Override
@@ -54,21 +56,32 @@ public class SpriteInstance extends Component {
         return SpriteInstance.class;
     }
 
-    public SpriteInstance sprite(Sprite sprite, int layer) {
-        if (this.sprite != null) {
-            Log.error("Cannot modify Sprite Instance component once you have set its Sprite");
-        } else {
-
-            this.sprite = assertNonNull(sprite);
-            this.layerOrder = layer;
-            doLater(() -> manager().enable(this));
-        }
+    public SpriteInstance sprite(Sprite sprite) {
+        this.sprite = sprite;
+        modify();
         return this;
     }
 
-    public Sprite sprite(){return this.sprite;}
+    public SpriteInstance layerOrder(int layerOrder){
+        this.layerOrder = layerOrder;
+        modify();
+        return this;
+    }
+
+    public Sprite sprite() {
+        return this.sprite;
+    }
 
     public int layerOrder() {
         return layerOrder;
+    }
+
+    public boolean modified() {
+        assertNotDeleted();
+        return modified;
+    }
+
+    public void modify() {
+        modified = true;
     }
 }

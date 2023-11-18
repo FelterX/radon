@@ -20,6 +20,8 @@ public class SpriteInstanceManager extends ComponentManager<SpriteInstance> impl
         this.removeInstances = new ArrayList<>();
     }
 
+
+    public void update(){spriteInstanceList.forEach(SpriteInstance::update);}
     @Override
     protected void add(SpriteInstance component) {
         spriteInstanceList.add(component);
