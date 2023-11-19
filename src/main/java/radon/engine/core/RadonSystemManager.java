@@ -1,6 +1,7 @@
 package radon.engine.core;
 
 import radon.engine.assets.AssetsSystem;
+import radon.engine.audio.AudioSystem;
 import radon.engine.events.EventManager;
 import radon.engine.graphics.Graphics;
 import radon.engine.graphics.rendering.RenderSystem;
@@ -27,7 +28,7 @@ public class RadonSystemManager {
     private final ResourceManager resourceManager;
     private final AssetsSystem assetsSystem;
     private final RenderSystem renderSystem;
-   // private final AudioSystem audioSystem;
+    private final AudioSystem audioSystem;
     private final TaskManager taskManager;
     private final SceneManager sceneManager;
     // All systems in array for sorted initialization / termination
@@ -42,7 +43,7 @@ public class RadonSystemManager {
                 resourceManager = createSystem(ResourceManager.class),
                 graphics = createSystem(Graphics.class),
                 input = createSystem(Input.class),
-                //audioSystem = createSystem(AudioSystem.class),
+                audioSystem = createSystem(AudioSystem.class),
                 assetsSystem = createSystem(AssetsSystem.class),
                 renderSystem = createSystem(RenderSystem.class),
                 taskManager = createSystem(TaskManager.class),
@@ -87,9 +88,9 @@ public class RadonSystemManager {
         return renderSystem;
     }
 
-    /**public AudioSystem getAudioSystem() {
+    public AudioSystem getAudioSystem() {
         return audioSystem;
-    }*/
+    }
 
     public TaskManager getTaskManager() {
         return taskManager;

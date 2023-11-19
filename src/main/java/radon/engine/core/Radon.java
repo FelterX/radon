@@ -1,5 +1,6 @@
 package radon.engine.core;
 
+import radon.engine.audio.AudioSystem;
 import radon.engine.events.EventManager;
 import radon.engine.graphics.GraphicsAPI;
 import radon.engine.graphics.rendering.APIRenderSystem;
@@ -22,7 +23,7 @@ import static radon.engine.util.types.TypeUtils.initSingleton;
 
 public class Radon {
 
-    public static final Version RADON_VERSION = new Version(1, 0, 0);
+    public static final Version RADON_VERSION = new Version(1, 0, 7);
     public static final String RADON_NAME = "Radon";
     public static final String GRAPHICS_THREAD_NAME = Thread.currentThread().getName();
     public static final AtomicBoolean LAUNCHED = new AtomicBoolean(false);
@@ -34,7 +35,7 @@ public class Radon {
     private final RadonApplication application;
     private final RadonSystemManager systems;
     private APIRenderSystem renderSystem;
-  //  private AudioSystem audioSystem;
+    private AudioSystem audioSystem;
     private Window window;
     private float updateDelay;
     private int updatesPerSecond;
@@ -130,7 +131,7 @@ public class Radon {
         application.start(getFirstScene());
 
         renderSystem = systems.getRenderSystem().getAPIRenderSystem();
-        //audioSystem = systems.getAudioSystem();
+        audioSystem = systems.getAudioSystem();
         window = Window.get();
 
         setup();
@@ -195,7 +196,7 @@ public class Radon {
         final EventManager eventManager = systems.getEventManager();
         final Input input = systems.getInputSystem();
         final SceneManager sceneManager = systems.getSceneManager();
-        //final AudioSystem audio = audioSystem;
+        final AudioSystem audio = audioSystem;
         final MaterialManager materials = MaterialManager.get();
         final TaskManager taskManager = systems.getTaskManager();
 
@@ -211,7 +212,7 @@ public class Radon {
 
             input.update();
 
-           // audio.update();
+            audio.update();
 
             sceneManager.update();
 

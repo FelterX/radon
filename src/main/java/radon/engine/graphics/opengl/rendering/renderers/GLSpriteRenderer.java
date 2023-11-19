@@ -47,15 +47,12 @@ public class GLSpriteRenderer extends GLRenderer {
     public void add(SpriteInstance instance) {
         boolean added = false;
 
-        Log.info("adding " + instance.entity().name());
-
         Sprite sprite = instance.sprite();
         for (GLSpriteBatch batch : batches) {
             if (batch.hasRoom() && batch.layerOrder() == instance.layerOrder()) {
                 GLTexture tex = sprite.texture();
                 if (tex == null || (batch.hasTexture(tex) || batch.hasTextureRoom())) {
                     batch.addSprite(instance);
-                    Log.info("added " + instance.entity().name());
                     added = true;
                     break;
                 }
@@ -67,7 +64,6 @@ public class GLSpriteRenderer extends GLRenderer {
             newBatch.init();
             batches.add(newBatch);
             newBatch.addSprite(instance);
-            Log.info("(NEW) added " + instance.entity().name());
             Collections.sort(batches);
         }
     }

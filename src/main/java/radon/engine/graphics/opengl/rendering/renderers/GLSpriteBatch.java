@@ -179,7 +179,6 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
             glBindBuffer(GL_ARRAY_BUFFER, vboID);
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
             rebufferData = false;
-            Log.info("Rebuffer Data");
         }
 
         for (int i = 0; i < textures.size(); i++) {
