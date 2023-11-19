@@ -21,6 +21,8 @@ import radon.engine.util.geometry.Rect;
 
 import java.lang.reflect.Method;
 
+import static radon.engine.util.Maths.radians;
+
 public class SpriteExample extends RadonApplication {
 
     public static void main(String[] args) {
@@ -53,6 +55,7 @@ public class SpriteExample extends RadonApplication {
         e.add(SpriteInstance.class).sprite(sprite00);
         e.get(Transform.class).position(0, 0, 0);
         e.get(Transform.class).scale(0.2f);
+        e.get(Transform.class).rotateY(radians(180.0f));
         e.add(SpriteBehaviour.class);
 
 

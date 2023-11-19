@@ -63,7 +63,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform position(float x, float y, float z) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenPosition(x, y, z);
             position.set(x, y, z);
             modify();
@@ -79,7 +79,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform translate(float x, float y, float z) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenPosition(position.x + x, position.y + y, position.z + z);
             position.add(x, y, z);
             modify();
@@ -99,7 +99,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform scale(float x, float y, float z) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenScale(x, y, z);
             scale.set(x, y, z);
             modify();
@@ -142,6 +142,10 @@ public final class Transform extends Component<Transform> {
         return rotation.getNormalizedRotation(new Quaternionf());
     }
 
+    public Matrix4f rotationMatrix() {
+        return rotation;
+    }
+
     public float angle() {
         assertNotDeleted();
         return rotation().angle();
@@ -150,7 +154,7 @@ public final class Transform extends Component<Transform> {
     public Transform resetRotation() {
         assertNotDeleted();
 
-        if(enabled()) {
+        if (enabled()) {
 
             rotation.identity();
 
@@ -162,7 +166,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform rotate(float radians, float x, float y, float z) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenRotation(radians, x, y, z);
             rotation.rotation(radians, x, y, z);
             modify();
@@ -187,7 +191,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform rotateX(float radians) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenRotation(radians, 1, 0, 0);
             rotation.rotationX(radians);
             modify();
@@ -197,7 +201,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform rotateY(float radians) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenRotation(radians, 0, 1, 0);
             rotation.rotationY(radians);
             modify();
@@ -207,7 +211,7 @@ public final class Transform extends Component<Transform> {
 
     public Transform rotateZ(float radians) {
         assertNotDeleted();
-        if(enabled()) {
+        if (enabled()) {
             updateChildrenRotation(radians, 0, 0, 1);
             rotation.rotationZ(radians);
             modify();
@@ -282,22 +286,22 @@ public final class Transform extends Component<Transform> {
     public boolean addChild(Transform child) {
         assertNotDeleted();
 
-        if(child == null) {
+        if (child == null) {
             Log.error("Cannot add a null child");
             return false;
         }
 
-        if(child.parent == this) {
+        if (child.parent == this) {
             Log.trace("The given transform is already a child of this transform");
             return false;
         }
 
-        if(child.parent != null) {
+        if (child.parent != null) {
             Log.error("The given transform already has a parent");
             return false;
         }
 
-        if(child.scene() != scene()) {
+        if (child.scene() != scene()) {
             Log.error("Cannot add a transform child from another scene");
             return false;
         }
@@ -310,7 +314,7 @@ public final class Transform extends Component<Transform> {
     public boolean hasChild(Transform child) {
         assertNotDeleted();
 
-        if(child == null) {
+        if (child == null) {
             return false;
         }
 
@@ -320,7 +324,7 @@ public final class Transform extends Component<Transform> {
     public boolean removeChild(Transform child) {
         assertNotDeleted();
 
-        if(!hasChild(child)) {
+        if (!hasChild(child)) {
             return false;
         }
 
@@ -328,7 +332,7 @@ public final class Transform extends Component<Transform> {
     }
 
     public void removeAllChildren() {
-        for(Transform child : children) {
+        for (Transform child : children) {
             child.parent = null;
         }
         children.clear();
@@ -366,7 +370,7 @@ public final class Transform extends Component<Transform> {
     @Override
     protected void onDestroy() {
 
-        if(parent != null) {
+        if (parent != null) {
             parent.removeChild(this);
         }
         parent = null;
@@ -398,7 +402,7 @@ public final class Transform extends Component<Transform> {
     }
 
     private void updateChildrenPosition(float newX, float newY, float newZ) {
-        if(children.isEmpty()) {
+        if (children.isEmpty()) {
             return;
         }
 
@@ -406,15 +410,15 @@ public final class Transform extends Component<Transform> {
         final float deltaY = newY - position.y;
         final float deltaZ = newZ - position.z;
 
-        for(Transform child : children) {
-            if(child.enabled()) {
+        for (Transform child : children) {
+            if (child.enabled()) {
                 child.translate(deltaX, deltaY, deltaZ);
             }
         }
     }
 
     private void updateChildrenScale(float newX, float newY, float newZ) {
-        if(children.isEmpty()) {
+        if (children.isEmpty()) {
             return;
         }
 
@@ -422,8 +426,8 @@ public final class Transform extends Component<Transform> {
         final float deltaY = newY - scale.y;
         final float deltaZ = newZ - scale.z;
 
-        for(Transform child : children) {
-            if(child.enabled()) {
+        for (Transform child : children) {
+            if (child.enabled()) {
                 final Vector3fc s = child.scale;
                 child.scale(s.x() + deltaX, s.y() + deltaY, s.z() + deltaZ);
             }
@@ -431,12 +435,12 @@ public final class Transform extends Component<Transform> {
     }
 
     private void updateChildrenRotation(float radians, float newX, float newY, float newZ) {
-        if(children.isEmpty()) {
+        if (children.isEmpty()) {
             return;
         }
 
-        for(Transform child : children) {
-            if(child.enabled()) {
+        for (Transform child : children) {
+            if (child.enabled()) {
                 child.rotate(radians, newX, newY, newZ);
             }
         }

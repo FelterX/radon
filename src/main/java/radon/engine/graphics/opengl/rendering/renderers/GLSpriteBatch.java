@@ -1,9 +1,6 @@
 package radon.engine.graphics.opengl.rendering.renderers;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.joml.Vector4f;
+import org.joml.*;
 import radon.engine.graphics.opengl.shaders.GLShaderProgram;
 import radon.engine.graphics.opengl.textures.GLTexture;
 import radon.engine.logging.Log;
@@ -221,10 +218,7 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
         }
 
         Transform transform = (Transform) instance.get(Transform.class);
-        Vector3fc position = transform.position();
-        Vector3fc scale = transform.scale();
 
-        // Add vertices with the appropriate properties
         float xAdd = 0.5f;
         float yAdd = 0.5f;
         for (int i = 0; i < 4; i++) {
@@ -236,10 +230,7 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
                 yAdd = 0.5f;
             }
 
-            Vector4f currentPos = new Vector4f(
-                    position.x() + (xAdd * scale.x()),
-                    position.y() + (yAdd * scale.y()),
-                    0, 1);
+            Vector4f currentPos = new Vector4f(xAdd, yAdd, 0, 1).mul(transform.modelMatrix());
 
             // Load position
             vertices[offset] = currentPos.x;
