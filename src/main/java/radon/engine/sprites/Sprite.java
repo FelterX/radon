@@ -31,10 +31,10 @@ public class Sprite {
 
     public Vector2f[] textureCoords() {
         return new Vector2f[]{
-                new Vector2f(bounds.left() / (float) texture.width(), bounds.top() / (float) texture.height()),
-                new Vector2f(bounds.left() / (float) texture.width(), bounds.bottom() / (float) texture.height()),
+                new Vector2f(bounds.right() / (float) texture.width(), bounds.top() / (float) texture.height()),
                 new Vector2f(bounds.right() / (float) texture.width(), bounds.bottom() / (float) texture.height()),
-                new Vector2f(bounds.right() / (float) texture.width(), bounds.top() / (float) texture.height())
+                new Vector2f(bounds.left() / (float) texture.width(), bounds.bottom() / (float) texture.height()),
+                new Vector2f(bounds.left() / (float) texture.width(), bounds.top() / (float) texture.height())
         };
     }
 }

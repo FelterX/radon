@@ -71,7 +71,8 @@ public class SpriteInstanceManager extends ComponentManager<SpriteInstance> impl
     @Override
     public void onAdded() {
         newInstances.clear();
-    }  @Override
+    }
+    @Override
     public void onRemoved() {
         removeInstances.clear();
     }

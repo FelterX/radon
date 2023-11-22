@@ -29,7 +29,7 @@ public class GLSpriteRenderer extends GLRenderer {
 
     public static final Path SPRITE_VERTEX_SHADER_PATH = RadonFiles.getPath("shaders/sprite/sprite.vert");
     public static final Path SPRITE_FRAGMENT_SHADER_PATH = RadonFiles.getPath("shaders/sprite/sprite.frag");
-    private static final int MAX_BATCH_SIZE = 1000;
+    private static final int MAX_BATCH_SIZE = 256;
 
     private final List<GLSpriteBatch> batches;
     private GLShaderProgram shader;
@@ -94,7 +94,7 @@ public class GLSpriteRenderer extends GLRenderer {
             removed = true;
         }
         if (removed) {
-            spriteInfo.onAdded();
+            spriteInfo.onRemoved();
         }
 
 

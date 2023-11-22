@@ -14,9 +14,12 @@ import radon.engine.scenes.components.meshes.MeshInstanceManager;
 import radon.engine.scenes.components.meshes.SceneMeshInfo;
 import radon.engine.scenes.components.sprites.SpriteInstance;
 import radon.engine.scenes.components.sprites.SpriteInstanceManager;
+import radon.engine.scenes.components.tilemap.TileMap;
+import radon.engine.scenes.components.tilemap.TileMapManager;
 import radon.engine.scenes.environment.SceneEnhancedWater;
 import radon.engine.scenes.environment.SceneEnvironment;
 import radon.engine.sprites.SceneSpriteInfo;
+import radon.engine.tiles.SceneTileMapInfo;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -51,6 +54,7 @@ public final class Scene {
     private final MeshInstanceManager meshes;
     private final AudioPlayerManager audio;
     private final SpriteInstanceManager sprites;
+    private final TileMapManager tileMaps;
 
     private final Map<Class<? extends Component>, ComponentManager<?>> componentManagers;
     // ===
@@ -86,6 +90,7 @@ public final class Scene {
         meshes = newInstance(MeshInstanceManager.class, this);
         audio = newInstance(AudioPlayerManager.class, this);
         sprites = newInstance(SpriteInstanceManager.class, this);
+        tileMaps = newInstance(TileMapManager.class, this);
 
         componentManagers = createComponentManagersMap();
         // ===
@@ -110,8 +115,13 @@ public final class Scene {
     public SceneMeshInfo meshInfo() {
         return meshes;
     }
+
     public SceneSpriteInfo spriteInfo() {
         return sprites;
+    }
+
+    public SceneTileMapInfo tileMapInfo() {
+        return tileMaps;
     }
 
     public SceneRenderInfo renderInfo() {
@@ -167,6 +177,7 @@ public final class Scene {
 
     void render() {
         renderSystem.render(this);
+        tileMaps.update();
     }
 
     void terminate() {
@@ -348,6 +359,7 @@ public final class Scene {
         components.put(MeshInstance.class, meshes);
         components.put(AudioPlayer.class, audio);
         components.put(SpriteInstance.class, sprites);
+        components.put(TileMap.class, tileMaps);
 
         return components;
     }
