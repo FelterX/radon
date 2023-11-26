@@ -43,6 +43,7 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
     private int vaoID, vboID;
     private int maxBatchSize;
     private Map<Integer, Map<Integer, Integer>> tileIndexMap;
+    private Queue<Integer> emptyIndex;
     boolean rebufferData = true;
 
     protected GLTileMapBatch(GLTileMapRenderer renderer, TileMap tileMap, int maxBatchSize) {
@@ -51,6 +52,7 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
         this.maxBatchSize = maxBatchSize;
 
         this.tileIndexMap = new HashMap<>();
+        this.emptyIndex = new ArrayDeque<>();
 
         this.vertices = new float[maxBatchSize * 4 * VERTEX_SIZE];
 
@@ -66,15 +68,16 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
             for (Map.Entry<Integer, TileInstance> entryY : yMap.entrySet()) {
                 int y = entryY.getKey();
                 TileInstance tile = entryY.getValue();
-                Sprite sprite = tile.sprite();
-                System.out.println(tile.i);
-                if(!hasTexture(sprite.texture()))
-                    textures.add(sprite.texture());
-
-                setTileIndex(x, y, numSprites);
-                numSprites++;
+                addTile(x, y, tile);
             }
         }
+    }
+
+    private int generateId() {
+        if (!emptyIndex.isEmpty())
+            return emptyIndex.poll();
+
+        return numSprites;
     }
 
     protected void init() {
@@ -134,31 +137,20 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
         if (tileMap.modified()) {
             List<Vector2i> updatedTile = tileMap.updatedTiles();
             for (Vector2i tilePos : updatedTile) {
-                loadVertexProperties(tilePos.x, tilePos.y);
+                int x = tilePos.x;
+                int y = tilePos.y;
+
+                if (!tileMap.contains(tilePos.x, tilePos.y)) {
+                    removeTile(x, y);
+                } else {
+                    if (getTileIndex(x, y) == -1)
+                        addTile(x, y, tileMap.getTileInstance(x, y));
+
+                    loadVertexProperties(tilePos.x, tilePos.y);
+                }
                 rebufferData = true;
             }
         }
-/*
-        for (int i = 0; i < numSprites; i++) {
-            SpriteInstance instance = sprites[i];
-            Transform transform = (Transform) instance.get(Transform.class);
-            Sprite sprite = instance.sprite();
-            if (instance.modified() || transform.modified()) {
-                if (!hasTexture(sprite.texture())) {
-                    this.renderer.remove(instance);
-                    this.renderer.add(instance);
-                } else {
-                    loadVertexProperties(i);
-                    rebufferData = true;
-                }
-            }
-
-            if (instance.layerOrder() != this.layerOrder) {
-                removeSprite(instance);
-                renderer.add(instance);
-                i--;
-            }
-        }*/
 
         if (rebufferData) {
             glBindBuffer(GL_ARRAY_BUFFER, vboID);
@@ -242,6 +234,47 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
         }
     }
 
+    private void addTile(int x, int y, TileInstance tile) {
+        if (!contains(x, y)) {
+            Sprite sprite = tile.sprite();
+            if (!hasTexture(sprite.texture()))
+                textures.add(sprite.texture());
+
+            int id = generateId();
+            setTileIndex(x, y, id);
+            numSprites++;
+        }
+    }
+
+    private void removeTile(int x, int y) {
+        int index = getTileIndex(x, y);
+        if (index == -1) return;
+
+        int offset = index * 4 * VERTEX_SIZE;
+
+        for (int i = 0; i < 4; i++) {
+            // Load position
+            vertices[offset] = 0;
+            vertices[offset + 1] = 0;
+
+            // Load color
+            vertices[offset + 2] = 1.0f;
+            vertices[offset + 3] = 1.0f;
+            vertices[offset + 4] = 1.0f;
+            vertices[offset + 5] = 1.0f;
+
+            // Load texture coordinates
+            vertices[offset + 6] = 0;
+            vertices[offset + 7] = 0;
+
+            // Load texture id
+            vertices[offset + 8] = 0;
+
+            offset += VERTEX_SIZE;
+        }
+        removeIndex(x, y);
+        numSprites--;
+    }
 
     public boolean contains(int x, int y) {
         Map<Integer, Integer> yMap = tileIndexMap.get(x);
@@ -257,6 +290,20 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
     private void setTileIndex(int x, int y, int index) {
         Map<Integer, Integer> yMap = tileIndexMap.computeIfAbsent(x, k -> new HashMap<>());
         yMap.put(y, index);
+    }
+
+    private void removeIndex(int x, int y) {
+        if (contains(x, y)) {
+            int index = getTileIndex(x, y);
+
+            Map<Integer, Integer> yMap = tileIndexMap.get(x);
+            yMap.remove(y);
+            if (yMap.isEmpty()) {
+                tileIndexMap.remove(x);
+            }
+
+            emptyIndex.add(index);
+        }
     }
 
     protected void terminate() {

@@ -74,16 +74,73 @@ public class TileMap extends Component {
         for (int i = -1; i < 2; i++)
             for (int j = -1; j < 2; j++)
                 updateTile(x + i, y + j);
+    }
 
+    public void removeTile(int x, int y) {
+        if (contains(x, y)) {
+            Map<Integer, TileInstance> yMap = tiles.get(x);
+            yMap.remove(y);
+            if (yMap.isEmpty()) {
+                tiles.remove(x);
+            }
 
+            for (int i = -1; i < 2; i++)
+                for (int j = -1; j < 2; j++)
+                    updateTile(x + i, y + j);
 
-        modify(x, y);
+            modify(x, y);
+        }
+    }
+
+    public void fill(int startX, int startY, int endX, int endY, Tile tile) {
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                if (contains(x, y)) {
+                    Map<Integer, TileInstance> yMap = tiles.get(x);
+                    yMap.remove(y);
+
+                    if (tile != null && yMap.isEmpty()) {
+                        tiles.remove(x);
+                    }
+                }
+
+                if (tile != null) {
+                    Map<Integer, TileInstance> yMap = tiles.computeIfAbsent(x, k -> new HashMap<>());
+                    yMap.put(y, new TileInstance(this, tile, x, y));
+                } else {
+                    modify(x, y);
+                }
+
+                updateFill(startX, startY, endX, endY, x, y);
+            }
+        }
+
+        if (tile != null) {
+            for (int x = startX; x <= endX; x++) {
+                for (int y = startY; y <= endY; y++) {
+                    updateTile(x, y);
+                    updateFill(startX, startY, endX, endY, x, y);
+                }
+            }
+        }
+    }
+
+    private void updateFill(int startX, int startY, int endX, int endY, int x, int y) {
+        if (x == startX) updateTile(startX - 1, y);
+        if (x == endX) updateTile(endX + 1, y);
+
+        if (y == startY) updateTile(x, startY - 1);
+        if (y == endY) updateTile(x, endY + 1);
+
+        if (x == startX && y == startY) updateTile(startX - 1, startY - 1);
+        if (x == endX && y == endY) updateTile(endX + 1, endY + 1);
     }
 
     public void updateTile(int x, int y) {
-        TileInstance instance = getTileInstance(x,y);
-        if(instance != null) {
+        TileInstance instance = getTileInstance(x, y);
+        if (instance != null) {
             instance.update();
+            modify(x, y);
         }
     }
 

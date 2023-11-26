@@ -10,6 +10,8 @@ import radon.engine.graphics.anim.keys.AnimationSpriteKey;
 import radon.engine.graphics.opengl.textures.GLTexture2D;
 import radon.engine.graphics.textures.Texture;
 import radon.engine.images.PixelFormat;
+import radon.engine.input.Input;
+import radon.engine.input.Key;
 import radon.engine.scenes.Camera;
 import radon.engine.scenes.Entity;
 import radon.engine.scenes.Scene;
@@ -32,6 +34,9 @@ public class SpriteExample extends RadonApplication {
     public static void main(String[] args) {
         Radon.launch(new SpriteExample());
     }
+
+    TileMap tileMap;
+    AutoTile tile;
 
     private SpriteExample() {
 
@@ -79,23 +84,13 @@ public class SpriteExample extends RadonApplication {
         animation.loop(true);
 
         Entity tileMapEntity = scene.newEntity("tileMapEntity");
-        TileMap tileMap = tileMapEntity.add(TileMap.class);
+        tileMap = tileMapEntity.add(TileMap.class);
 
         GLTexture2D spriteSheet = (GLTexture2D) GraphicsFactory.get().newTexture2D(RadonFiles.getPath("examples/sheet_dev.png"), PixelFormat.RGBA).setQuality(Texture.Quality.LOW);
         Sprite[] sprites = AutoTillingGenerator.generateSpriteSheet(spriteSheet, 16, 16);
-
-        AutoTile tile = new AutoTile(0, "tile", sprites);
+        tile = new AutoTile(0, "tile", sprites);
 
         java.util.Random random = new Random();
-
-        for (int i = 0; i < 32; i++) {
-            for (int j = 0; j < 32; j++) {
-                if (random.nextFloat() >= 0.4f)
-                    tileMap.setTile(i, j, tile);
-            }
-        }
-
-
 
     }
 
@@ -106,5 +101,9 @@ public class SpriteExample extends RadonApplication {
         Vector3f pos = (Vector3f) SceneManager.scene().entity("Player").get(Transform.class).position();
 
         SceneManager.scene().camera().position(pos.x, pos.y, 10);
+
+
+        if (Input.isKeyTyped(Key.KEY_1)) tileMap.fill(0, 0, 10, 10, null);
+        if (Input.isKeyTyped(Key.KEY_2)) tileMap.fill(0, 0, 10, 10, tile);
     }
 }
