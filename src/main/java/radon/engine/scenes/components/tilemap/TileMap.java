@@ -125,6 +125,45 @@ public class TileMap extends Component {
         }
     }
 
+    public void fill(int startX, int startY, Tile[][] tilesArray) {
+        for (int row = 0; row < tilesArray.length; row++) {
+            for (int col = 0; col < tilesArray[row].length; col++) {
+
+                int x = startX + row;
+                int y = startY + col;
+                Tile tile = tilesArray[row][col];
+
+                if (contains(x, y)) {
+                    Map<Integer, TileInstance> yMap = tiles.get(x);
+                    yMap.remove(y);
+
+                    if (tile != null && yMap.isEmpty()) {
+                        tiles.remove(x);
+                    }
+                }
+
+                if (tile != null) {
+                    Map<Integer, TileInstance> yMap = tiles.computeIfAbsent(x, k -> new HashMap<>());
+                    yMap.put(y, new TileInstance(this, tile, x, y));
+                } else {
+                    modify(x, y);
+                }
+
+                updateFill(startX, startY, startX + tilesArray.length, startY + tilesArray[row].length, x, y);
+            }
+        }
+
+        for (int row = 0; row < tilesArray.length; row++) {
+            for (int col = 0; col < tilesArray[row].length; col++) {
+                int x = startX + row;
+                int y = startY + col;
+
+                updateTile(x, y);
+                updateFill(startX, startY, startX + tilesArray.length, startY + tilesArray[row].length, x, y);
+            }
+        }
+    }
+
     private void updateFill(int startX, int startY, int endX, int endY, int x, int y) {
         if (x == startX) updateTile(startX - 1, y);
         if (x == endX) updateTile(endX + 1, y);
