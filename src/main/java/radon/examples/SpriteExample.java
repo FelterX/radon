@@ -90,8 +90,6 @@ public class SpriteExample extends RadonApplication {
         Sprite[] sprites = AutoTillingGenerator.generateSpriteSheet(spriteSheet, 16, 16);
         tile = new AutoTile(0, "tile", sprites);
 
-        java.util.Random random = new Random();
-
     }
 
     @Override
@@ -103,7 +101,8 @@ public class SpriteExample extends RadonApplication {
         SceneManager.scene().camera().position(pos.x, pos.y, 10);
 
 
-        if (Input.isKeyTyped(Key.KEY_1)) tileMap.fill(0, 0, 10, 10, null);
-        if (Input.isKeyTyped(Key.KEY_2)) tileMap.fill(0, 0, 10, 10, tile);
+        if (Input.isKeyTyped(Key.KEY_1)) tileMap.fill(0, 0, 2, 2, tile);
+        if (Input.isKeyTyped(Key.KEY_2)) tileMap.fill(0, 0, 2, 2, null);
+        if (Input.isKeyTyped(Key.KEY_3)) tileMap.fill(0, 0, 1, 1, null);
     }
 }

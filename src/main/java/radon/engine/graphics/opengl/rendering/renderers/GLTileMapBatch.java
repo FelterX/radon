@@ -140,13 +140,13 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
                 int x = tilePos.x;
                 int y = tilePos.y;
 
-                if (!tileMap.contains(tilePos.x, tilePos.y)) {
+                if (!tileMap.contains(x, y)) {
                     removeTile(x, y);
                 } else {
                     if (getTileIndex(x, y) == -1)
                         addTile(x, y, tileMap.getTileInstance(x, y));
 
-                    loadVertexProperties(tilePos.x, tilePos.y);
+                    loadVertexProperties(x, y);
                 }
                 rebufferData = true;
             }
@@ -167,7 +167,7 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
-        glDrawElements(GL_TRIANGLES, this.numSprites * 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, this.maxBatchSize * 6, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
