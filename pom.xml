@@ -6,7 +6,7 @@
 
     <groupId>fr.felterx</groupId>
     <artifactId>radon</artifactId>
-    <version>1.0.12</version>
+    <version>1.0.13</version>
 
     <properties>
         <maven.compiler.source>16</maven.compiler.source>

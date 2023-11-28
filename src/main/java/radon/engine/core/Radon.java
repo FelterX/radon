@@ -23,7 +23,7 @@ import static radon.engine.util.types.TypeUtils.initSingleton;
 
 public class Radon {
 
-    public static final Version RADON_VERSION = new Version(1, 0, 12);
+    public static final Version RADON_VERSION = new Version(1, 0, 13);
     public static final String RADON_NAME = "Radon";
     public static final String GRAPHICS_THREAD_NAME = Thread.currentThread().getName();
     public static final AtomicBoolean LAUNCHED = new AtomicBoolean(false);

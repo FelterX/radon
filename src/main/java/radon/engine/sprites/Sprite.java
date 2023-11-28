@@ -13,7 +13,7 @@ public class Sprite {
     protected Rect bounds;
 
     public Sprite(GLTexture texture) {
-        this(texture, new Rect(0, 0, texture.width(), texture.height()));
+        this(texture, new Rect(0, texture.width(), 0, texture.height()));
     }
 
     public Sprite(GLTexture texture, Rect bounds) {

@@ -3,15 +3,14 @@ package radon.engine.graphics.opengl.rendering.renderers;
 import org.joml.Vector2f;
 import org.joml.Vector2i;
 import radon.engine.graphics.opengl.textures.GLTexture;
-import radon.engine.logging.Log;
-import radon.engine.scenes.components.math.Transform;
-import radon.engine.scenes.components.sprites.SpriteInstance;
 import radon.engine.scenes.components.tilemap.TileMap;
 import radon.engine.sprites.Sprite;
 import radon.engine.tiles.Tile;
 import radon.engine.tiles.TileInstance;
+import radon.engine.tiles.properties.TileProperty;
 
 import java.util.*;
+import java.util.concurrent.CancellationException;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
@@ -179,14 +178,17 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
     }
 
     private void loadVertexProperties(int x, int y) {
-        TileInstance tile = tileMap.getTileInstance(x, y);
-        if (tile == null) return;
+        TileInstance instance = tileMap.getTileInstance(x, y);
+        if (instance == null) return;
 
         int index = getTileIndex(x, y);
         if (index == -1) return;
 
-        Sprite sprite = tile.sprite();
+        Tile tile = instance.tile();
+        Sprite sprite = instance.sprite();
         GLTexture texture = sprite.texture();
+        Vector2i size = tile.getPropertyValue(TileProperty.MULTI_TILE_SIZE) != null ? tile.getPropertyValue(TileProperty.MULTI_TILE_SIZE) : new Vector2i(1);
+        Vector2i center = tile.getPropertyValue(TileProperty.MULTI_TILE_CENTER) != null ? tile.getPropertyValue(TileProperty.MULTI_TILE_CENTER) : new Vector2i(0);
 
         int offset = index * 4 * VERTEX_SIZE;
 
@@ -202,20 +204,20 @@ public class GLTileMapBatch implements Comparable<GLTileMapBatch> {
             }
         }
 
-        float xAdd = 0.5f;
-        float yAdd = 0.5f;
+        float xAdd = 1f;
+        float yAdd = 1f;
         for (int i = 0; i < 4; i++) {
             if (i == 1) {
-                yAdd = -0.5f;
+                yAdd = 0f;
             } else if (i == 2) {
-                xAdd = -0.5f;
+                xAdd = 0f;
             } else if (i == 3) {
-                yAdd = 0.5f;
+                yAdd = 1f;
             }
 
             // Load position
-            vertices[offset] = (x + xAdd) * tileMap.tileSize();
-            vertices[offset + 1] = (y + yAdd) * tileMap.tileSize();
+            vertices[offset] = (x + xAdd * size.x - center.x) * tileMap.tileSize();
+            vertices[offset + 1] = (y + yAdd * size.y - center.y) * tileMap.tileSize();
 
             // Load color
             vertices[offset + 2] = 1.0f;

@@ -1,5 +1,6 @@
 package radon.examples;
 
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import radon.engine.core.Radon;
 import radon.engine.core.RadonApplication;
@@ -21,6 +22,8 @@ import radon.engine.scenes.components.math.Transform;
 import radon.engine.scenes.components.sprites.SpriteInstance;
 import radon.engine.scenes.components.tilemap.TileMap;
 import radon.engine.sprites.Sprite;
+import radon.engine.tiles.MultiTile;
+import radon.engine.tiles.Tile;
 import radon.engine.tiles.autotiling.AutoTile;
 import radon.engine.tiles.autotiling.AutoTillingGenerator;
 import radon.engine.util.geometry.Rect;
@@ -90,6 +93,17 @@ public class SpriteExample extends RadonApplication {
         Sprite[] sprites = AutoTillingGenerator.generateSpriteSheet(spriteSheet, 16, 16);
         tile = new AutoTile(0, "tile", sprites);
 
+        GLTexture2D testMultiTile = (GLTexture2D) GraphicsFactory.get().newTexture2D(RadonFiles.getPath("examples/multi_tile.png"), PixelFormat.RGBA).setQuality(Texture.Quality.LOW);
+        Sprite sprite = new Sprite(testMultiTile);
+        MultiTile multiTile = new MultiTile(1, "multiTile", sprite, new Vector2i(1, 3), new Vector2i(0,1));
+        Tile[][] tiles = new Tile[][]
+                {
+                        {tile, tile, tile},
+                        {tile, tile, tile},
+                        {tile, tile, multiTile}
+                };
+
+        tileMap.fill(0, 0, tiles);
     }
 
     @Override
@@ -99,10 +113,5 @@ public class SpriteExample extends RadonApplication {
         Vector3f pos = (Vector3f) SceneManager.scene().entity("Player").get(Transform.class).position();
 
         SceneManager.scene().camera().position(pos.x, pos.y, 10);
-
-
-        if (Input.isKeyTyped(Key.KEY_1)) tileMap.fill(0, 0, 2, 2, tile);
-        if (Input.isKeyTyped(Key.KEY_2)) tileMap.fill(0, 0, 2, 2, null);
-        if (Input.isKeyTyped(Key.KEY_3)) tileMap.fill(0, 0, 1, 1, null);
     }
 }

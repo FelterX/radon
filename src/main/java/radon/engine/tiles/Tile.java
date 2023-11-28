@@ -31,7 +31,7 @@ public class Tile {
         return sprite;
     }
 
-    protected <T> Tile addProperty(String property, T value) {
+    public <T> Tile addProperty(String property, T value) {
         TileProperty<T> tileProperty = new TileProperty<>(property, value);
         properties.put(property, tileProperty);
         return this;
