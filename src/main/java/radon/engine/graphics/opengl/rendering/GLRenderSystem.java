@@ -40,7 +40,7 @@ public final class GLRenderSystem implements APIRenderSystem {
     private final GLMeshRenderer meshRenderer;
     private final GLWaterRenderer waterRenderer;
     private final GLSpriteRenderer spriteRenderer;
-    private final GLTileMapRenderer tileMapRenderer;
+
 
     // Shading Pipelines
     private final GLShadingPipelineManager shadingPipelineManager;
@@ -58,7 +58,6 @@ public final class GLRenderSystem implements APIRenderSystem {
         meshRenderer = new GLMeshRenderer(context, shadowRenderer);
         waterRenderer = new GLWaterRenderer(context, meshRenderer, skyboxRenderer);
         spriteRenderer = new GLSpriteRenderer(context);
-        tileMapRenderer = new GLTileMapRenderer(context);
 
         shadingPipelineManager = new GLShadingPipelineManager(context);
 
@@ -72,7 +71,6 @@ public final class GLRenderSystem implements APIRenderSystem {
         waterRenderer.init();
         shadowRenderer.init();
         spriteRenderer.init();
-        tileMapRenderer.init();
 
         shadingPipelineManager.init();
     }
@@ -126,7 +124,6 @@ public final class GLRenderSystem implements APIRenderSystem {
 
         waterRenderer.render(scene);
 
-        tileMapRenderer.render(scene);
         spriteRenderer.render(scene);
 
         if (environment.skybox() != null) {

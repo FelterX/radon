@@ -95,15 +95,20 @@ public class SpriteExample extends RadonApplication {
 
         GLTexture2D testMultiTile = (GLTexture2D) GraphicsFactory.get().newTexture2D(RadonFiles.getPath("examples/multi_tile.png"), PixelFormat.RGBA).setQuality(Texture.Quality.LOW);
         Sprite sprite = new Sprite(testMultiTile);
-        MultiTile multiTile = new MultiTile(1, "multiTile", sprite, new Vector2i(1, 3), new Vector2i(0,1));
+        MultiTile multiTile = new MultiTile(1, "multiTile", sprite, new Vector2i(1, 3));
         Tile[][] tiles = new Tile[][]
                 {
                         {tile, tile, tile},
                         {tile, tile, tile},
-                        {tile, tile, multiTile}
+                        {tile, tile, tile}
                 };
 
         tileMap.fill(0, 0, tiles);
+
+        Entity tileMapEntity2 = scene.newEntity("tileMapEntity2");
+        TileMap tileMap2 = tileMapEntity2.add(TileMap.class).useHardShadow(true);
+
+        tileMap2.setTile(0, 0, multiTile);
     }
 
     @Override

@@ -93,7 +93,7 @@ public class AutoTillingProcessor {
 
         Sprite[] sprites = tileI.tile().getPropertyValue(TileProperty.AUTO_TILING);
 
-        tileI.sprite(sprites[i], i);
+        tileI.sprite(sprites[i]/*, i */);
     }
 
     private static boolean detectSameTileType(Tile a, Tile b) {

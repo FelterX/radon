@@ -1,11 +1,13 @@
 package radon.engine.scenes.components.tilemap;
 
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import radon.engine.scenes.Component;
-import radon.engine.scenes.components.behaviours.AbstractBehaviour;
+import radon.engine.scenes.Entity;
+import radon.engine.scenes.components.math.Transform;
+import radon.engine.scenes.components.sprites.SpriteInstance;
 import radon.engine.tiles.Tile;
 import radon.engine.tiles.TileInstance;
+import radon.engine.tiles.properties.TileProperty;
 
 import java.util.*;
 
@@ -16,19 +18,42 @@ public class TileMap extends Component {
     private float tileSize = 1 / 16f;
     private boolean modified = false;
     private List<Vector2i> updatedTiles = new ArrayList<>();
+    private boolean useHardShadow = false;
 
 
-    /*Map<Integer, Map<Integer, Tile>> tiles = tileMap.tiles();
-   for (Map.Entry<Integer, Map<Integer, Tile>> entryX : tiles.entrySet()) {
-       int x = entryX.getKey();
-       Map<Integer, Tile> yMap = entryX.getValue();
-       for (Map.Entry<Integer, Tile> entryY : yMap.entrySet()) {
-           int y = entryY.getKey();
-           Tile tile = entryY.getValue();
+    private TileInstance createTileInstance(int x, int y, Tile tile) {
+        if (!contains(x, y)) {
+            Entity tileEntity = scene().newEntity(entity().name() + ":tile_" + x + "," + y);
 
+            Vector2i offset = tile.getPropertyValue(TileProperty.MULTI_TILE_CENTER);
+            Vector2i size = tile.getPropertyValue(TileProperty.MULTI_TILE_SIZE);
 
-       }
-   }*/
+            float posX = x;
+            if (offset != null) x += offset.x;
+            float posY = y;
+            if (offset != null) y += offset.y;
+
+            float sizeX = tileSize;
+            if (size != null) sizeX *= size.x;
+            float sizeY = tileSize;
+            if (size != null) sizeY *= size.y;
+
+            Transform transform = tileEntity.get(Transform.class);
+            transform.translate(posX * sizeX, posY * sizeY, layerOrder);
+            transform.scale(sizeX, sizeY, 1);
+            entity().get(Transform.class).addChild(transform);
+
+            tileEntity.add(TileInstance.class).setup(x, y, tile, this);
+            tileEntity.add(SpriteInstance.class)
+                    .sprite(tile.sprite())
+                    .anchor(0, 0);
+
+            return tileEntity.get(TileInstance.class);
+        }
+
+        return null;
+    }
+
     protected void update() {
         if (modified()) {
             modified = false;
@@ -69,7 +94,7 @@ public class TileMap extends Component {
 
     public void setTile(int x, int y, Tile tile) {
         Map<Integer, TileInstance> yMap = tiles.computeIfAbsent(x, k -> new HashMap<>());
-        yMap.put(y, new TileInstance(this, tile, x, y));
+        yMap.put(y, createTileInstance(x, y, tile));
 
         for (int i = -1; i < 2; i++)
             for (int j = -1; j < 2; j++)
@@ -79,10 +104,13 @@ public class TileMap extends Component {
     public void removeTile(int x, int y) {
         if (contains(x, y)) {
             Map<Integer, TileInstance> yMap = tiles.get(x);
+            scene().destroy(yMap.get(y).entity());
+
             yMap.remove(y);
             if (yMap.isEmpty()) {
                 tiles.remove(x);
             }
+
 
             for (int i = -1; i < 2; i++)
                 for (int j = -1; j < 2; j++)
@@ -106,7 +134,7 @@ public class TileMap extends Component {
 
                 if (tile != null) {
                     Map<Integer, TileInstance> yMap = tiles.computeIfAbsent(x, k -> new HashMap<>());
-                    yMap.put(y, new TileInstance(this, tile, x, y));
+                    yMap.put(y, createTileInstance(x, y, tile));
                 } else {
                     modify(x, y);
                 }
@@ -135,8 +163,8 @@ public class TileMap extends Component {
 
                 if (contains(x, y)) {
                     Map<Integer, TileInstance> yMap = tiles.get(x);
+                    scene().destroy(yMap.get(y).entity());
                     yMap.remove(y);
-
                     if (tile != null && yMap.isEmpty()) {
                         tiles.remove(x);
                     }
@@ -144,7 +172,7 @@ public class TileMap extends Component {
 
                 if (tile != null) {
                     Map<Integer, TileInstance> yMap = tiles.computeIfAbsent(x, k -> new HashMap<>());
-                    yMap.put(y, new TileInstance(this, tile, x, y));
+                    yMap.put(y, createTileInstance(x, y, tile));
                 } else {
                     modify(x, y);
                 }
@@ -217,5 +245,14 @@ public class TileMap extends Component {
 
     public Map<Integer, Map<Integer, TileInstance>> tiles() {
         return tiles;
+    }
+
+    public boolean useHardShadow() {
+        return useHardShadow;
+    }
+
+    public TileMap useHardShadow(boolean useHardShadow) {
+        this.useHardShadow = useHardShadow;
+        return this;
     }
 }

@@ -218,19 +218,23 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
         }
 
         Transform transform = (Transform) instance.get(Transform.class);
+        Vector3f scale = (Vector3f) transform.scale();
+        Vector2f anchor = instance.anchor();
 
-        float xAdd = 0.5f;
-        float yAdd = 0.5f;
+        float xAdd = 1.0f;
+        float yAdd = 1.0f;
         for (int i = 0; i < 4; i++) {
             if (i == 1) {
-                yAdd = -0.5f;
+                yAdd = 0.0f;
             } else if (i == 2) {
-                xAdd = -0.5f;
+                xAdd = 0.0f;
             } else if (i == 3) {
-                yAdd = 0.5f;
+                yAdd = 1.0f;
             }
 
             Vector4f currentPos = new Vector4f(xAdd, yAdd, 0, 1).mul(transform.modelMatrix());
+            currentPos.x -= anchor.x * scale.x;
+            currentPos.y -= anchor.y * scale.y;
 
             // Load position
             vertices[offset] = currentPos.x;
