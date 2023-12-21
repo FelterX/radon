@@ -4,6 +4,7 @@ package radon.engine.meshes;
 import radon.engine.images.Image;
 import radon.engine.images.ImageFactory;
 import radon.engine.images.PixelFormat;
+import radon.engine.util.Maths;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
@@ -42,16 +43,16 @@ public final class TerrainMeshLoader {
 
     public TerrainMesh load(String name, Path heightMapPath, float size, float minY, float maxY) {
 
-        if(cache.containsKey(name)) {
+        if (cache.containsKey(name)) {
             TerrainMesh mesh = cache.get(name);
-            if(mesh.released()) {
+            if (mesh.released()) {
                 cache.remove(name);
             } else {
                 return mesh;
             }
         }
 
-        try(Image heightMapImage = ImageFactory.newImage(heightMapPath, PixelFormat.RGBA)) {
+        try (Image heightMapImage = ImageFactory.newImage(heightMapPath, PixelFormat.RGBA)) {
 
             TerrainMesh mesh = generateTerrain(name, size, minY, maxY, heightMapImage.width(), heightMapImage.height(), heightMapImage.pixels());
 
@@ -75,9 +76,9 @@ public final class TerrainMeshLoader {
         int normalsOffset = VERTEX_NORMAL_OFFSET;
         int textCoordsOffset = VERTEX_TEXCOORDS_OFFSET;
 
-        for(int row = 0; row < height; row++) {
+        for (int row = 0; row < height; row++) {
 
-            for(int column = 0; column < width; column++) {
+            for (int column = 0; column < width; column++) {
 
                 final float currentHeight = getHeightAt(minY, maxY, column, row, width, pixels);
                 heights[column][row] = currentHeight;
@@ -95,7 +96,53 @@ public final class TerrainMeshLoader {
                 textCoordsOffset += VERTEX_DATA_SIZE;
 
                 // Create indices
-                if(column < width - 1 && row < height - 1) {
+                if (column < width - 1 && row < height - 1) {
+                    setIndices(width, indices, row, column);
+                }
+            }
+        }
+
+        vertices.rewind();
+        indices.rewind();
+
+        final HeightMap heightMap = new HeightMap(size, heights, minY, maxY);
+
+        return MeshManager.get().createTerrainMesh(name, vertices, indices, heightMap);
+    }
+
+    public TerrainMesh generateTerrain(String name, float size, float minY, float maxY, int width, int height, float[][] heights) {
+
+        final float incX = size / (width - 1);
+        final float incZ = size / (height - 1);
+
+        ByteBuffer vertices = memCalloc(width * height * VERTEX_DATA_SIZE);
+        ByteBuffer indices = memCalloc((width - 1) * (height - 1) * 6 * INT32_SIZEOF);
+
+        int positionsOffset = VERTEX_POSITION_OFFSET;
+        int normalsOffset = VERTEX_NORMAL_OFFSET;
+        int textCoordsOffset = VERTEX_TEXCOORDS_OFFSET;
+
+        for (int row = 0; row < height; row++) {
+
+            for (int column = 0; column < width; column++) {
+
+                final float currentHeight = getHeightAt(minY, maxY, column, row, heights);
+                heights[column][row] = currentHeight;
+
+                // Position
+                setPosition(vertices, positionsOffset, currentHeight, row, column, incX, incZ);
+                positionsOffset += VERTEX_DATA_SIZE;
+
+                // Normal
+                setNormal(vertices, normalsOffset, row, column, minY, maxY, width, heights);
+                normalsOffset += VERTEX_DATA_SIZE;
+
+                // Set texture coordinates
+                setTextureCoordinates(vertices, textCoordsOffset, row, column, width, height);
+                textCoordsOffset += VERTEX_DATA_SIZE;
+
+                // Create indices
+                if (column < width - 1 && row < height - 1) {
                     setIndices(width, indices, row, column);
                 }
             }
@@ -120,6 +167,23 @@ public final class TerrainMeshLoader {
         final float heightR = getHeightAt(minY, maxY, column + 1, row, width, pixels);
         final float heightD = getHeightAt(minY, maxY, column, row - 1, width, pixels);
         final float heightU = getHeightAt(minY, maxY, column, row + 1, width, pixels);
+
+        vertices.putFloat(offset, heightL - heightR)
+                .putFloat(offset + FLOAT32_SIZEOF, 2.0f)
+                .putFloat(offset + 2 * FLOAT32_SIZEOF, heightD - heightU);
+    }
+
+    private void setNormal(ByteBuffer vertices, int offset,
+                           int row, int column,
+                           float minY, float maxY,
+                           int width, float[][] heights) {
+
+        // Finite difference method
+
+        final float heightL = getHeightAt(minY, maxY, column - 1, row, heights);
+        final float heightR = getHeightAt(minY, maxY, column + 1, row, heights);
+        final float heightD = getHeightAt(minY, maxY, column, row - 1, heights);
+        final float heightU = getHeightAt(minY, maxY, column, row + 1, heights);
 
         vertices.putFloat(offset, heightL - heightR)
                 .putFloat(offset + FLOAT32_SIZEOF, 2.0f)
@@ -167,9 +231,13 @@ public final class TerrainMeshLoader {
         return minY + Math.abs(maxY - minY) * (argb / MAX_VALUE);
     }
 
+    private float getHeightAt(float minY, float maxY, int x, int z, float[][] heights) {
+        return Maths.clamp(minY, maxY, heights[x][z]);
+    }
+
     public static int getARGB(int x, int z, int width, ByteBuffer pixels) {
 
-        if(x < 0 || x >= width || z < 0 || z >= width) {
+        if (x < 0 || x >= width || z < 0 || z >= width) {
             return 0;
         }
 

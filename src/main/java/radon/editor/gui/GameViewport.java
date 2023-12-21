@@ -115,7 +115,7 @@ public class GameViewport extends EditorWindow {
 
                         camera.yaw(camera.yaw() + dx * mouseSensitivity * deltaTime());
                     }else if (ImGui.isMouseDown(2)) {
-                        float dx = (float) (newMouseX - oldMouseX);
+                        float dx = -(float) (newMouseX - oldMouseX);
                         if (dx != 0) {
                             camera.move(dx > 0.0f ? Camera.Direction.RIGHT : Camera.Direction.LEFT, moveSpeed * 17.0f * deltaTime());
                         }
