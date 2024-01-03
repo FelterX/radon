@@ -186,11 +186,15 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
+        glEnableVertexAttribArray(3);
 
         glDrawElements(GL_TRIANGLES, this.numSprites * 6, GL_UNSIGNED_INT, 0);
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+        glDisableVertexAttribArray(3);
         glBindVertexArray(0);
 
         for (int i = 0; i < textures.size(); i++) {
@@ -233,8 +237,8 @@ public class GLSpriteBatch implements Comparable<GLSpriteBatch> {
             }
 
             Vector4f currentPos = new Vector4f(xAdd, yAdd, 0, 1).mul(transform.modelMatrix());
-            currentPos.x -= anchor.x * scale.x;
-            currentPos.y -= anchor.y * scale.y;
+           // currentPos.x -= anchor.x * scale.x;
+           // currentPos.y -= anchor.y * scale.y;
 
             // Load position
             vertices[offset] = currentPos.x;

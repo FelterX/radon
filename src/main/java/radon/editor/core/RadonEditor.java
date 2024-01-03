@@ -1,9 +1,7 @@
 package radon.editor.core;
 
 import radon.editor.gui.*;
-import radon.engine.core.Radon;
-import radon.engine.core.RadonApplication;
-import radon.engine.core.RadonFiles;
+import radon.engine.core.*;
 import radon.engine.graphics.GraphicsFactory;
 import radon.engine.graphics.opengl.textures.GLTexture2D;
 import radon.engine.graphics.textures.Texture;
@@ -41,6 +39,8 @@ public class RadonEditor extends RadonApplication {
     private FilesWindow filesWindow;
 
     private RadonEditor() {
+
+        RadonConfigurationHelper.releaseConfiguration();
     }
 
     public static void main(String[] args) {

@@ -4,6 +4,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import radon.editor.core.RadonEditor;
+import radon.engine.logging.Log;
 import radon.engine.scenes.Entity;
 import radon.engine.scenes.Scene;
 import radon.engine.scenes.SceneManager;
@@ -40,6 +41,19 @@ public class SceneHierarchy extends EditorWindow {
                     ImGui.popID();
                 }
             }
+
+
+            // Add Scene objects
+
+
+
+
+            if (ImGui.beginPopup("Scene Objects")) {
+
+                ImGui.endPopup();
+            }
+
+
         }
 
         ImGui.end();
@@ -51,10 +65,10 @@ public class SceneHierarchy extends EditorWindow {
         Entity entity = transform.entity();
         boolean open;
 
-        int flags  =
+        int flags =
                 ImGuiTreeNodeFlags.FramePadding |
-                ImGuiTreeNodeFlags.OpenOnArrow |
-                ImGuiTreeNodeFlags.SpanAvailWidth;
+                        ImGuiTreeNodeFlags.OpenOnArrow |
+                        ImGuiTreeNodeFlags.SpanAvailWidth;
 
         if (RadonEditor.selected == entity)
             flags |= ImGuiTreeNodeFlags.Selected;

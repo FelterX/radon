@@ -2,7 +2,6 @@ package radon.project.serialization;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import radon.engine.serialization.VersionDeserializer;
 import radon.engine.serialization.VersionSerializer;
 import radon.engine.util.Version;
 import radon.project.Project;
@@ -17,7 +16,6 @@ public class Serializer {
     static {
         GsonBuilder builder = new GsonBuilder();
         builder.registerTypeAdapter(Version.class, new VersionSerializer());
-        builder.registerTypeAdapter(Version.class, new VersionDeserializer());
         builder.registerTypeAdapter(Project.class, new ProjectSerializer());
         builder.registerTypeAdapter(Project.class, new ProjectDeserializer());
 
